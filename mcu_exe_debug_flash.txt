@@ -1,0 +1,65 @@
+https://www.youtube.com/watch?v=4RjEmcT6JpM&list=PLERTijJOmYrDiiWd10iRHY0VRHdJwUH4g&index=6
+
+
+computer (HOST)		 <------ flash, debug prog file ---------->    mcu (TARGET)
+
+(host interface: USB)	 <----  debugger/In-circuit programmer --->    (target interface: SWD/JTAG)
+				(debug adapter)
+
+SWD  - SINGLE WIRE DEBUGGING
+JTAG - JOINT TAG
+Required
+--------
+	- application on host (openOCD)
+	- Programming adapter (external or in-built on target)
+	- telnet client (port 4444)
+	- gdb client (port 3333)
+	
+
+an application is required on the host to make the flash, debug, program process possible using gdb.
+Such application is called openOCD (open on-chip debugger) and it also use to analyze and test
+programs on embedded target. 
+
+programming adapter (external or inbuilt on chip)
+	it used for protocol converstion where USB protocol from the host is delivered to the target
+	by accessing the debug interface on target via native protocol signaling such as (SWD, JTAG)
+	typical type availabble
+	----------------------
+		segger j-link edu - JTAG/SWD debugger
+		Keil ulink pro
+		STlink/V2 -  only for ST MCU
+		
+
+
+
+STEPS
+-----
+	- download and install openOCD
+		* openodc.org/getting-openocd/
+		* windows or linux or mac available
+		* Linux : sudo apt install openocd
+	- install telnet client (for windows one can use putty software)
+	- run openOCD with board configuration file
+		* default config file location: /usr/local/openocd/scripts/board
+	- connect openOCD via telnet client or gdb client
+	- issue commands over telnet or gdb client to openOCD to download and debug the code.
+		make flash						: execute makefile recipe "flash"
+		open new terminal and type the following command.       : see reference below, openocd cmd
+		$ arm-none-eabi-gdb
+		$ (gdb) target extended-remote localhost:3333
+		$ (gbd) monitor reset init
+		$ (gdb) monitor flash write_image erase <app_file (a.out)>
+		$ (gdb) monitor reset halt 				: reset mcu and halt, no code exec
+		$ (gdb) monitor reset 	 				: reset mcu and exec code immediately
+		$ (gdb) monitor resume					: resume code execution
+		$ (gdb) monitor halt					: halt code execution
+		$ (gdb) monitor mdw 0x20000000 5			: read the data store in addr & 5more
+		$ (gdb) monitor bp 0x00004532				: set breakpoint at addr or function
+		 
+
+
+OPENOCD COMMANDS
+---------------
+	REFERENCE: openocd.org/doc/html/General-Commands.html
+
+
